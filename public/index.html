@@ -1,28 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Workout Tracker</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workout App</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Workout Tracker</h1>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="Images/workoutAppLogo.png" alt="Workout App Logo" />
+      <span>WorkoutApp</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">HOME</a></li>
+      <li><a href="#">PROFILE</a></li>
+      <li><a href="#">SETTINGS</a></li>
+    </ul>
+  </nav>
 
-  <section id="log-workout">
-    <h2>Log New Workout</h2>
-    <input id="exercise-name" placeholder="Exercise name">
-    <input id="sets" type="number" placeholder="Sets">
-    <input id="reps" type="number" placeholder="Reps">
-    <input id="weight" type="number" placeholder="Weight (kg)">
-    <button id="add-workout">Add Workout</button>
-  </section>
+  <!-- Main Content -->
+  <main class="main-container">
+    <!-- Log Workout Section -->
+    <section class="log-workout">
+      <h2>Log Workout</h2>
+      <form id="workoutForm">
+        <input type="text" id="exercise-name" placeholder="Exercise Name ..." required />
+        <input type="number" id="weight" placeholder="Weight ..." required />
+        <input type="number" id="sets" placeholder="Sets ..." required />
+        <input type="number" id="reps" placeholder="Reps ..." required />
+        <button type="button" id="add-workout" class="btn add-btn">Add Exercise</button>
+      </form>
+    </section>
 
-  <section id="workout-history">
-    <h2>Workout History</h2>
-    <ul id="history-list"></ul>
-  </section>
+    <!-- Current Workout + History -->
+    <section class="current-workout">
+      <h3>Current Workout</h3>
+      <ul id="workoutList"></ul>
+      <button type="button" id="save-workout" class="btn save-btn">Save Workout</button>
+
+      <div class="workout-history">
+        <h3>Workout History</h3>
+        <ul id="history-list"></ul>
+      </div>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
 </html>
+
