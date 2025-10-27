@@ -1,0 +1,24 @@
+{
+  "name": "adaptive-workout-app",
+  "version": "1.0.0",
+  "description": "Final year project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeclanMannion314/Adaptive-Workout-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DeclanMannion314/Adaptive-Workout-App/issues"
+  },
+  "homepage": "https://github.com/DeclanMannion314/Adaptive-Workout-App#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
