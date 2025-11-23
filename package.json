@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/DeclanMannion314/Adaptive-Workout-App#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "better-sqlite3": "^12.4.6",
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7"
   }
 }

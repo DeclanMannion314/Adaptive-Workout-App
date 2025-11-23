@@ -1,75 +1,84 @@
 // Add exercise to current workout
-document.getElementById("add-workout").addEventListener("click", () => {
+document.getElementById("add-workout").addEventListener("click", async () => {
   const exercise = document.getElementById("exercise-name").value.trim();
   const sets = parseInt(document.getElementById("sets").value);
   const reps = parseInt(document.getElementById("reps").value);
   const weight = parseFloat(document.getElementById("weight").value);
 
   if (!exercise || !sets || !reps || !weight) {
-    alert("Please fill in all fields!");
+    alert("Please fill out all fields");
     return;
   }
 
-  // Get current workout from localStorage or start empty
-  const currentWorkout = JSON.parse(localStorage.getItem("currentWorkout")) || [];
-  currentWorkout.push({ exercise, sets, reps, weight });
-  localStorage.setItem("currentWorkout", JSON.stringify(currentWorkout));
+  await fetch("/api/exercise", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: 1,
+      exercise,
+      sets,
+      reps,
+      weight
+    })
+  });
 
-  // Clear inputs
   document.getElementById("workoutForm").reset();
 
-  // Update current workout display
-  showCurrentWorkout();
+  loadCurrentWorkout();
 });
 
-// Save current workout as a session
-document.getElementById("save-workout").addEventListener("click", () => {
-  const currentWorkout = JSON.parse(localStorage.getItem("currentWorkout")) || [];
-  if (!currentWorkout.length) {
-    alert("Add exercises before saving!");
+// Save workout session
+document.getElementById("save-workout").addEventListener("click", async () => {
+  const res = await fetch("/api/workout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id: 1 })
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    alert("Nothing to save!");
     return;
   }
 
-  const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
-  sessions.push({ date: new Date().toLocaleDateString(), exercises: currentWorkout });
-  localStorage.setItem("sessions", JSON.stringify(sessions));
-
-  // Clear current workout
-  localStorage.removeItem("currentWorkout");
-
-  // Update displays
-  showCurrentWorkout();
-  showHistory();
+  loadCurrentWorkout();
+  loadHistory();
 });
 
-// Display current workout
-function showCurrentWorkout() {
+// Load current workout
+async function loadCurrentWorkout() {
   const list = document.getElementById("workoutList");
   list.innerHTML = "";
 
-  const currentWorkout = JSON.parse(localStorage.getItem("currentWorkout")) || [];
-  currentWorkout.forEach((ex) => {
+  const res = await fetch("/api/current/1");
+  const exercises = await res.json();
+
+  exercises.forEach(ex => {
     const li = document.createElement("li");
     li.textContent = `${ex.exercise} - ${ex.sets}x${ex.reps} @ ${ex.weight}kg`;
     list.appendChild(li);
   });
 }
 
-// Display workout history
-function showHistory() {
+// Load workout history
+async function loadHistory() {
   const historyList = document.getElementById("history-list");
   historyList.innerHTML = "";
 
-  const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
-  sessions.forEach((session) => {
+  const res = await fetch("/api/workouts/1");
+  const sessions = await res.json();
+
+  sessions.forEach(session => {
     const li = document.createElement("li");
     li.innerHTML = `<strong>${session.date}</strong>`;
 
     const ul = document.createElement("ul");
-    session.exercises.forEach((ex) => {
-      const exLi = document.createElement("li");
-      exLi.textContent = `${ex.exercise} - ${ex.sets}x${ex.reps} @ ${ex.weight}kg`;
-      ul.appendChild(exLi);
+
+    session.exercises.forEach(ex => {
+      const item = document.createElement("li");
+      item.textContent = `${ex.exercise} - ${ex.sets}x${ex.reps} @ ${ex.weight}kg`;
+      ul.appendChild(item);
     });
 
     li.appendChild(ul);
@@ -77,6 +86,6 @@ function showHistory() {
   });
 }
 
-// Initial display
-showCurrentWorkout();
-showHistory();
+// Initial load
+loadCurrentWorkout();
+loadHistory();
