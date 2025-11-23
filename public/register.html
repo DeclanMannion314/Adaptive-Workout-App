@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Register - WorkoutApp</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -10,9 +11,9 @@
     <h2>Create Account</h2>
 
     <form id="register-form">
-      <input id="username" placeholder="Username" autocomplete="username" required />
-      <input id="email" placeholder="Email" autocomplete="email" required />
-      <input id="password" type="password" placeholder="Password" autocomplete="new-password" required />
+      <input id="username" placeholder="Username" autocomplete="username" />
+      <input id="email" placeholder="Email" autocomplete="email" />
+      <input id="password" type="password" placeholder="Password" autocomplete="new-password" />
       <button type="submit" class="btn">Register</button>
     </form>
 
@@ -21,7 +22,7 @@
 
   <script>
   document.getElementById("register-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // prevent page reload
 
     const username = document.getElementById("username").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -43,6 +44,7 @@
     window.location.href = "login.html";
   });
   </script>
+
 </body>
 </html>
 
