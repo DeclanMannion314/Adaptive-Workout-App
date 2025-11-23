@@ -24,4 +24,15 @@ db.prepare(`
   );
 `).run();
 
+// User registration/login
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password TEXT,
+    email TEXT
+  )
+`).run();
+
+
 console.log("Database initialized!");

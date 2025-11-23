@@ -1,4 +1,24 @@
-const userId = 1;
+let userId = null;
+
+// ---------- Check Login ----------
+async function checkLogin() {
+  const res = await fetch("/api/profile");
+  const data = await res.json();
+
+  if (!data.success) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Store logged-in user ID
+  userId = data.user.id;
+
+  // Load data after userId is set
+  loadCurrentWorkout();
+  loadHistory();
+}
+
+checkLogin();
 
 // ---------- Add Exercise ----------
 document.getElementById("add-workout").addEventListener("click", async () => {
@@ -25,9 +45,11 @@ document.getElementById("add-workout").addEventListener("click", async () => {
 // ---------- Clear Current Workout ----------
 document.getElementById("clear-current").addEventListener("click", async () => {
   const exercises = await (await fetch(`/api/current/${userId}`)).json();
+
   for (let ex of exercises) {
     await fetch(`/api/exercise/${ex.id}`, { method: "DELETE" });
   }
+
   loadCurrentWorkout();
 });
 
@@ -41,6 +63,7 @@ document.getElementById("save-workout").addEventListener("click", async () => {
 
   const data = await res.json();
   if (!data.success) return alert("Nothing to save!");
+
   loadCurrentWorkout();
   loadHistory();
 });
@@ -56,14 +79,11 @@ async function loadCurrentWorkout() {
     const li = document.createElement("li");
     li.textContent = `${ex.exercise} - ${ex.sets}x${ex.reps} @ ${ex.weight}kg`;
 
-    // Edit button
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.classList.add("edit-btn");
     editBtn.onclick = () => openEditModal(ex, "current");
 
-
-    // Delete button
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
     delBtn.classList.add("delete-btn");
@@ -89,7 +109,6 @@ async function loadHistory() {
     const li = document.createElement("li");
     li.innerHTML = `<strong>Session: ${session.date}</strong>`;
 
-    // Delete entire session
     const delSessionBtn = document.createElement("button");
     delSessionBtn.textContent = "Delete Session";
     delSessionBtn.classList.add("delete-btn");
@@ -105,7 +124,6 @@ async function loadHistory() {
       const item = document.createElement("li");
       item.textContent = `${ex.exercise} - ${ex.sets}x${ex.reps} @ ${ex.weight}kg`;
 
-      // Edit individual exercise in session
       const editExBtn = document.createElement("button");
       editExBtn.textContent = "Edit";
       editExBtn.classList.add("edit-btn");
@@ -120,7 +138,7 @@ async function loadHistory() {
   });
 }
 
-let currentEdit = null; // store the exercise being edited
+let currentEdit = null;
 
 const modal = document.getElementById("edit-modal");
 const editForm = document.getElementById("edit-form");
@@ -130,28 +148,24 @@ const editSets = document.getElementById("edit-sets");
 const editReps = document.getElementById("edit-reps");
 const editWeight = document.getElementById("edit-weight");
 
-// ---------- Open Modal ----------
+// ---------- Modal Handlers ----------
 function openEditModal(ex, type, sessionId = null) {
-  currentEdit = { ...ex, type, sessionId }; // store type: 'current' or 'session'
-
+  currentEdit = { ...ex, type, sessionId };
   editExerciseName.value = ex.exercise;
   editSets.value = ex.sets;
   editReps.value = ex.reps;
   editWeight.value = ex.weight;
-
   modal.style.display = "flex";
 }
 
-// ---------- Close Modal ----------
 function closeEditModal() {
   modal.style.display = "none";
   currentEdit = null;
 }
 
-// ---------- Cancel Button ----------
 cancelEditBtn.addEventListener("click", closeEditModal);
 
-// ---------- Save Edited Exercise ----------
+// ---------- Save Edits ----------
 editForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -171,7 +185,7 @@ editForm.addEventListener("submit", async (e) => {
       body: JSON.stringify(updated)
     });
     loadCurrentWorkout();
-  } else if (currentEdit.type === "session") {
+  } else {
     await fetch(`/api/session/${currentEdit.sessionId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -182,8 +196,3 @@ editForm.addEventListener("submit", async (e) => {
 
   closeEditModal();
 });
-
-
-// ---------- Initial Load ----------
-loadCurrentWorkout();
-loadHistory();

@@ -11,6 +11,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+// Register/Login
+const session = require("express-session");
+const bcrypt = require("bcryptjs");
+
+app.use(
+  session({
+    secret: "supersecretworkoutapp",
+    resave: false,
+    saveUninitialized: false
+  })
+);
+
 // ----------------------
 // DATABASE SETUP
 // ----------------------
@@ -44,9 +56,73 @@ db.prepare(`
   )
 `).run();
 
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    email TEXT,
+    password TEXT
+  )
+`).run();
+
+
 // ----------------------
 // API ROUTES
 // ----------------------
+
+// Register User
+app.post("/api/register", async (req, res) => {
+  const { username, password, email } = req.body;
+
+  const hashed = await bcrypt.hash(password, 10);
+
+  try {
+    db.prepare(
+      `INSERT INTO users (username, password, email) VALUES (?, ?, ?)`
+    ).run(username, hashed, email);
+
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: "Username already exists." });
+  }
+});
+
+// Login User
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body;
+
+  const user = db
+    .prepare("SELECT * FROM users WHERE username = ?")
+    .get(username);
+
+  if (!user) return res.json({ success: false, message: "User not found" });
+
+  const valid = bcrypt.compareSync(password, user.password);
+  if (!valid)
+    return res.json({ success: false, message: "Incorrect password" });
+
+  req.session.userId = user.id;
+  res.json({ success: true, userId: user.id });
+});
+
+// Logout
+app.post("/api/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.json({ success: true });
+  });
+});
+
+// Get Profile info.
+app.get("/api/profile", (req, res) => {
+  if (!req.session.userId)
+    return res.json({ success: false, message: "Not logged in" });
+
+  const user = db
+    .prepare("SELECT id, username, email FROM users WHERE id = ?")
+    .get(req.session.userId);
+
+  res.json({ success: true, user });
+});
 
 // Add exercise to current workout
 app.post("/api/exercise", (req, res) => {
