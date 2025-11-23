@@ -1,19 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Profile</title>
+  <meta charset="UTF-8">
+  <title>Profile - WorkoutApp</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="center-page">
 
-<div class="profile-box">
-  <h2>Your Profile</h2>
+  <div class="auth-box profile-box">
+    <h2>Your Profile</h2>
 
-  <p><strong>Username:</strong> <span id="username"></span></p>
-  <p><strong>Email:</strong> <span id="email"></span></p>
+    <form id="profile-form">
+      <label for="username">Username</label>
+      <input id="username" type="text" disabled />
 
-  <button id="logout-btn" class="btn delete-btn">Logout</button>
-</div>
+      <label for="email">Email</label>
+      <input id="email" type="email" disabled />
+
+      <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <button type="button" id="back-btn" class="btn add-btn">Back to Dashboard</button>
+        <button type="button" id="logout-btn" class="btn delete-btn">Logout</button>
+      </div>
+    </form>
+  </div>
 
 <script>
 async function loadProfile() {
@@ -25,14 +34,20 @@ async function loadProfile() {
     return;
   }
 
-  document.getElementById("username").textContent = data.user.username;
-  document.getElementById("email").textContent = data.user.email;
+  document.getElementById("username").value = data.user.username;
+  document.getElementById("email").value = data.user.email;
 }
 
-document.getElementById("logout-btn").onclick = async () => {
+// Go back to main app page
+document.getElementById("back-btn").addEventListener("click", () => {
+  window.location.href = "index.html";
+});
+
+// Logout
+document.getElementById("logout-btn").addEventListener("click", async () => {
   await fetch("/api/logout", { method: "POST" });
   window.location.href = "login.html";
-};
+});
 
 loadProfile();
 </script>
