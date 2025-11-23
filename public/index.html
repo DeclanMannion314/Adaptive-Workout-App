@@ -48,6 +48,23 @@
     </section>
   </main>
 
+    <!-- Edit Exercise Modal -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <h3>Edit Exercise</h3>
+      <form id="edit-form">
+        <input type="text" id="edit-exercise-name" placeholder="Exercise Name" required />
+        <input type="number" id="edit-sets" placeholder="Sets" required />
+        <input type="number" id="edit-reps" placeholder="Reps" required />
+        <input type="number" id="edit-weight" placeholder="Weight" required />
+        <div class="modal-buttons">
+          <button type="submit" class="btn save-btn">Save</button>
+          <button type="button" id="cancel-edit" class="btn delete-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
   <script src="script.js"></script>
 </body>
 </html>

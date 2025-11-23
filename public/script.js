@@ -60,24 +60,8 @@ async function loadCurrentWorkout() {
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.classList.add("edit-btn");
-    editBtn.onclick = async () => {
-      const newExercise = prompt("Exercise Name:", ex.exercise) || ex.exercise;
-      const newSets = parseInt(prompt("Sets:", ex.sets)) || ex.sets;
-      const newReps = parseInt(prompt("Reps:", ex.reps)) || ex.reps;
-      const newWeight = parseFloat(prompt("Weight:", ex.weight)) || ex.weight;
+    editBtn.onclick = () => openEditModal(ex, "current");
 
-      await fetch(`/api/exercise/${ex.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          exercise: newExercise,
-          sets: newSets,
-          reps: newReps,
-          weight: newWeight
-        })
-      });
-      loadCurrentWorkout();
-    };
 
     // Delete button
     const delBtn = document.createElement("button");
@@ -125,19 +109,7 @@ async function loadHistory() {
       const editExBtn = document.createElement("button");
       editExBtn.textContent = "Edit";
       editExBtn.classList.add("edit-btn");
-      editExBtn.onclick = async () => {
-        const newExercise = prompt("Exercise Name:", ex.exercise) || ex.exercise;
-        const newSets = parseInt(prompt("Sets:", ex.sets)) || ex.sets;
-        const newReps = parseInt(prompt("Reps:", ex.reps)) || ex.reps;
-        const newWeight = parseFloat(prompt("Weight:", ex.weight)) || ex.weight;
-
-        await fetch(`/api/session/${session.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ exercises: [{ ...ex, exercise: newExercise, sets: newSets, reps: newReps, weight: newWeight }] })
-        });
-        loadHistory();
-      };
+      editExBtn.onclick = () => openEditModal(ex, "session", session.id);
 
       item.appendChild(editExBtn);
       ul.appendChild(item);
@@ -147,6 +119,70 @@ async function loadHistory() {
     historyList.appendChild(li);
   });
 }
+
+let currentEdit = null; // store the exercise being edited
+
+const modal = document.getElementById("edit-modal");
+const editForm = document.getElementById("edit-form");
+const cancelEditBtn = document.getElementById("cancel-edit");
+const editExerciseName = document.getElementById("edit-exercise-name");
+const editSets = document.getElementById("edit-sets");
+const editReps = document.getElementById("edit-reps");
+const editWeight = document.getElementById("edit-weight");
+
+// ---------- Open Modal ----------
+function openEditModal(ex, type, sessionId = null) {
+  currentEdit = { ...ex, type, sessionId }; // store type: 'current' or 'session'
+
+  editExerciseName.value = ex.exercise;
+  editSets.value = ex.sets;
+  editReps.value = ex.reps;
+  editWeight.value = ex.weight;
+
+  modal.style.display = "flex";
+}
+
+// ---------- Close Modal ----------
+function closeEditModal() {
+  modal.style.display = "none";
+  currentEdit = null;
+}
+
+// ---------- Cancel Button ----------
+cancelEditBtn.addEventListener("click", closeEditModal);
+
+// ---------- Save Edited Exercise ----------
+editForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!currentEdit) return;
+
+  const updated = {
+    exercise: editExerciseName.value.trim(),
+    sets: parseInt(editSets.value),
+    reps: parseInt(editReps.value),
+    weight: parseFloat(editWeight.value)
+  };
+
+  if (currentEdit.type === "current") {
+    await fetch(`/api/exercise/${currentEdit.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated)
+    });
+    loadCurrentWorkout();
+  } else if (currentEdit.type === "session") {
+    await fetch(`/api/session/${currentEdit.sessionId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ exercises: [{ ...currentEdit, ...updated }] })
+    });
+    loadHistory();
+  }
+
+  closeEditModal();
+});
+
 
 // ---------- Initial Load ----------
 loadCurrentWorkout();
