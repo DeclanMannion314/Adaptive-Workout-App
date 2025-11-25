@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Coach</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="Images/workoutAppLogo.png" alt="Workout App Logo" />
+      <span>WorkoutApp</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">HOME</a></li>
+      <li><a class="active" href="ai-coach.html">AI COACH</a></li>
+      <li><a href="dashboard.html">DASHBOARD</a></li>
+      <li><a href="profile.html">PROFILE</a></li>
+      <li><a href="login.html" id="logout-nav">LOGOUT</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Layout -->
+  <main class="main-container">
+
+    <!-- Left Panel -->
+    <section class="log-workout">
+      <h2>AI Workout Coach</h2>
+
+      <p class="ai-description">Select your exercise and training goal.</p>
+
+      <!-- Exercise Selector -->
+      <label style="color:white;">Choose Exercise</label>
+      <select id="exercise-selector" class="input-select">
+        <option value="Bench Press">Bench Press</option>
+        <option value="Squat">Squat</option>
+        <option value="Deadlift">Deadlift</option>
+        <option value="Overhead Press">Overhead Press</option>
+        <option value="Barbell Row">Barbell Row</option>
+      </select>
+
+      <!-- Goal Selector -->
+      <label style="color:white; margin-top:10px;">Training Goal</label>
+      <select id="goal-selector" class="input-select">
+        <option value="strength">Strength</option>
+        <option value="hypertrophy">Hypertrophy</option>
+        <option value="power">Power</option>
+      </select>
+
+      <button id="generate-ai" class="btn save-btn" style="margin-top:20px;">
+        Generate Recommendations
+      </button>
+
+    </section>
+
+    <!-- Right Panel -->
+    <section class="current-workout">
+      <h3>Your AI Recommendations</h3>
+      <div id="ai-results" class="ai-results-box">
+        <p class="placeholder-msg">Click “Generate Recommendations” to begin.</p>
+      </div>
+
+      <h3>Your Strength Estimates</h3>
+      <div id="strength-estimates" class="ai-results-box">
+        <p class="placeholder-msg">Rep max results will appear here.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="ai-coach.js"></script>
+</body>
+</html>

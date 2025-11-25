@@ -444,3 +444,42 @@ canvas {
   width: 100% !important;
   height: 350px !important;
 }
+
+/* AI COACH PAGE */
+.ai-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ai-block {
+  background: #7A9E9F;
+  padding: 25px;
+  border-radius: 10px;
+  color: white;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.ai-block h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.ai-block ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.ai-block li {
+  margin-bottom: 6px;
+}
+
+.input-select {
+  padding: 10px;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
+  width: 100%;
+  margin-bottom: 10px;
+}
