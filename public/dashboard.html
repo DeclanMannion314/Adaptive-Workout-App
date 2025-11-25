@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workout Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">
+    <img src="Images/workoutAppLogo.png" alt="Logo">
+    <span>WorkoutApp</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">HOME</a></li>
+    <li><a href="profile.html">PROFILE</a></li>
+    <li><a href="login.html" id="logout-nav">LOGOUT</a></li>
+  </ul>
+</nav>
+
+<!-- Dashboard Container -->
+<div class="dashboard-container">
+
+  <h2>Workout Dashboard</h2>
+
+  <!-- Dashboard Cards -->
+  <div class="dashboard-grid">
+    <div class="dash-card">
+      <h3>Total Workouts</h3>
+      <p id="total-workouts">0</p>
+    </div>
+    <div class="dash-card">
+      <h3>Total Exercises Logged</h3>
+      <p id="total-exercises">0</p>
+    </div>
+    <div class="dash-card">
+      <h3>Most Common Exercise</h3>
+      <p id="top-exercise">Loading...</p>
+    </div>
+  </div>
+
+  <!-- Chart Selector -->
+  <h3>Workout Charts</h3>
+  <select id="chartTypeSelector">
+    <option value="day">Volume by Day</option>
+    <option value="week">Volume by Week</option>
+    <option value="month">Volume by Month</option>
+    <option value="muscle">Exercises by Muscle Group</option>
+  </select>
+
+  <!-- Dynamic Chart -->
+  <canvas id="dynamicChart" width="400" height="200" style="margin-top: 20px;"></canvas>
+
+  <!-- Max Weight Chart -->
+  <h3 style="margin-top: 40px;">Max Weight by Rep Range</h3>
+  <canvas id="maxWeightChart" width="400" height="200" style="margin-top: 20px;"></canvas>
+
+  <!-- Workout Sessions -->
+  <h3 style="margin-top: 40px;">Workout Sessions</h3>
+  <ul id="session-list" class="session-history"></ul>
+
+</div>
+
+<!-- Dashboard JS -->
+<script src="dashboard.js"></script>
+
+</body>
+</html>
