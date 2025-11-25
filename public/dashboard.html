@@ -43,21 +43,28 @@
     </div>
   </div>
 
-  <!-- Chart Selector -->
-  <h3>Workout Charts</h3>
-  <select id="chartTypeSelector">
-    <option value="day">Volume by Day</option>
-    <option value="week">Volume by Week</option>
-    <option value="month">Volume by Month</option>
-    <option value="muscle">Exercises by Muscle Group</option>
-  </select>
+  <div class="chart-flex">
 
-  <!-- Dynamic Chart -->
-  <canvas id="dynamicChart" width="400" height="200" style="margin-top: 20px;"></canvas>
+  <div class="chart-box">
+    <h3>Workout Volume Chart</h3>
+    <select id="chartTypeSelector">
+      <option value="day">Volume by Day</option>
+      <option value="week">Volume by Week</option>
+      <option value="month">Volume by Month</option>
+      <option value="muscle">Exercises by Muscle Group</option>
+    </select>
+    <canvas id="dynamicChart"></canvas>
+  </div>
 
-  <!-- Max Weight Chart -->
-  <h3 style="margin-top: 40px;">Max Weight by Rep Range</h3>
-  <canvas id="maxWeightChart" width="400" height="200" style="margin-top: 20px;"></canvas>
+  <div class="chart-box">
+    <h3>Max Weight by Rep Range</h3>
+    <select id="exerciseSelector">
+      <option value="all">All Exercises</option>
+    </select>
+    <canvas id="maxWeightChart"></canvas>
+  </div>
+
+</div>
 
   <!-- Workout Sessions -->
   <h3 style="margin-top: 40px;">Workout Sessions</h3>

@@ -1,4 +1,5 @@
-let dynamicChart; // Chart.js instance for dynamic chart
+let dynamicChart;
+let maxWeightChartInstance;
 
 // ----------------------------
 // Get Current Logged-in User
@@ -8,11 +9,11 @@ async function getLoggedInUser() {
     const res = await fetch("/api/profile");
     const data = await res.json();
     if (data.success) return data.user.id;
-    else {
-      alert("Not logged in. Redirecting to login page.");
-      window.location.href = "/login.html"; // redirect to login page
-      return null;
-    }
+
+    alert("Not logged in. Redirecting to login...");
+    window.location.href = "/login.html";
+    return null;
+
   } catch (err) {
     console.error("Failed to fetch user info:", err);
     return null;
@@ -31,169 +32,212 @@ async function initDashboard() {
   const topExerciseEl = document.getElementById("top-exercise");
   const sessionListEl = document.getElementById("session-list");
   const chartSelector = document.getElementById("chartTypeSelector");
+  const exerciseSelector = document.getElementById("exerciseSelector");
 
-  // ----------------------------
-  // Load Workouts
-  // ----------------------------
-  async function loadWorkouts() {
-    try {
-      const res = await fetch(`/api/workouts/${userId}`);
-      const workouts = await res.json();
-      return workouts;
-    } catch (err) {
-      console.error("Error loading workouts:", err);
-      return [];
-    }
-  }
-
-  const workouts = await loadWorkouts();
+  // Load workouts
+  const workouts = await loadWorkouts(userId);
 
   updateDashboardStats(workouts);
   populateSessions(workouts);
+
+  // Populate Exercise Dropdown
+  const exerciseSet = new Set();
+  workouts.forEach(w => w.exercises.forEach(e => exerciseSet.add(e.exercise)));
+  exerciseSet.forEach(ex => {
+    const option = document.createElement("option");
+    option.value = ex;
+    option.textContent = ex;
+    exerciseSelector.appendChild(option);
+  });
+
   renderDynamicChart(workouts, chartSelector.value);
-  renderMaxWeightChart(workouts);
+  renderMaxWeightChart(workouts, "all");
 
   chartSelector.addEventListener("change", () => {
     renderDynamicChart(workouts, chartSelector.value);
   });
 
-  // ----------------------------
-  // Dashboard Stats
-  // ----------------------------
-  function updateDashboardStats(workouts) {
-    totalWorkoutsEl.textContent = workouts.length;
+  exerciseSelector.addEventListener("change", () => {
+    renderMaxWeightChart(workouts, exerciseSelector.value);
+  });
+}
 
-    const allExercises = [];
-    workouts.forEach(w => w.exercises.forEach(e => allExercises.push(e.exercise)));
-    totalExercisesEl.textContent = allExercises.length;
+// ----------------------------
+// Load Workouts
+// ----------------------------
+async function loadWorkouts(userId) {
+  try {
+    const res = await fetch(`/api/workouts/${userId}`);
+    return await res.json();
+  } catch (err) {
+    console.error("Error loading workouts:", err);
+    return [];
+  }
+}
+
+// ----------------------------
+// Dashboard Stats
+// ----------------------------
+function updateDashboardStats(workouts) {
+  document.getElementById("total-workouts").textContent = workouts.length;
+
+  const allExercises = workouts.flatMap(w => w.exercises.map(e => e.exercise));
+  document.getElementById("total-exercises").textContent = allExercises.length;
+
+  const counts = {};
+  allExercises.forEach(ex => counts[ex] = (counts[ex] || 0) + 1);
+
+  const top = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b, "N/A");
+  document.getElementById("top-exercise").textContent = top;
+}
+
+// ----------------------------
+// Populate Sessions (click to expand)
+// ----------------------------
+function populateSessions(workouts) {
+  const list = document.getElementById("session-list");
+  list.innerHTML = "";
+
+  workouts.forEach((session) => {
+    const li = document.createElement("li");
+    const date = new Date(session.date).toLocaleDateString();
+
+    li.textContent = `${date} - ${session.exercises.length} exercises`;
+
+    const details = document.createElement("div");
+    details.classList.add("session-details");
+    details.style.display = "none";
+
+    details.innerHTML = session.exercises
+      .map(e => `<p><strong>${e.exercise}</strong>: ${e.sets} x ${e.reps} @ ${e.weight}kg</p>`)
+      .join("");
+
+    li.addEventListener("click", () => {
+      details.style.display = details.style.display === "none" ? "block" : "none";
+    });
+
+    li.appendChild(details);
+    list.appendChild(li);
+  });
+}
+
+// ----------------------------
+// Dynamic Chart
+// ----------------------------
+function renderDynamicChart(workouts, type) {
+  if (dynamicChart) dynamicChart.destroy();
+
+  let labels = [];
+  let data = [];
+  let bgColor = "rgba(122, 158, 159, 0.7)";
+
+  if (type === "day") {
+    const daily = {};
+    workouts.forEach(w => {
+      const key = new Date(w.date).toISOString().slice(0, 10);
+      let volume = w.exercises.reduce((sum, e) => sum + e.sets * e.reps * e.weight, 0);
+      daily[key] = (daily[key] || 0) + volume;
+    });
+    labels = Object.keys(daily).sort();
+    data = labels.map(k => daily[k]);
+
+  } else if (type === "week" || type === "month") {
+    const aggregate = {};
+    workouts.forEach(w => {
+      const d = new Date(w.date);
+      let key;
+
+      if (type === "week") {
+        d.setDate(d.getDate() - d.getDay());
+        key = d.toISOString().slice(0, 10);
+      } else {
+        key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+      }
+
+      let volume = w.exercises.reduce((s,e)=>s+e.sets*e.reps*e.weight,0);
+      aggregate[key] = (aggregate[key] || 0) + volume;
+    });
+
+    labels = Object.keys(aggregate).sort();
+    data = labels.map(k => aggregate[k]);
+
+  } else if (type === "muscle") {
+    const muscleMap = {
+      "Bench Press": "Chest",
+      "Squat": "Legs",
+      "Deadlift": "Back",
+      "Shoulder Press": "Shoulders",
+      "Bicep Curl": "Arms",
+      "Tricep Extension": "Arms",
+      "Plank": "Core",
+      "Crunch": "Core"
+    };
 
     const counts = {};
-    allExercises.forEach(name => counts[name] = (counts[name] || 0) + 1);
-    const topExercise = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b, "N/A");
-    topExerciseEl.textContent = topExercise;
+    workouts.forEach(w =>
+      w.exercises.forEach(e => {
+        const m = muscleMap[e.exercise] || "Other";
+        counts[m] = (counts[m] || 0) + (e.sets * e.reps);
+      })
+    );
+
+    labels = Object.keys(counts);
+    data = labels.map(k => counts[k]);
+    bgColor = "rgba(254, 95, 85, 0.7)";
   }
 
-  // ----------------------------
-  // Populate Sessions
-  // ----------------------------
-  function populateSessions(workouts) {
-    sessionListEl.innerHTML = "";
-    workouts.forEach(session => {
-      const li = document.createElement("li");
-      const date = new Date(session.date).toLocaleDateString();
-      li.textContent = `${date} - ${session.exercises.length} exercises`;
-      sessionListEl.appendChild(li);
-    });
-  }
-
-  // ----------------------------
-  // Dynamic Chart
-  // ----------------------------
-  function renderDynamicChart(workouts, type) {
-    if (dynamicChart) dynamicChart.destroy();
-
-    let labels = [];
-    let data = [];
-    let bgColor = "rgba(122, 158, 159, 0.7)";
-
-    if (type === "day") {
-      const daily = {};
-      workouts.forEach(w => {
-        const dateKey = new Date(w.date).toISOString().slice(0, 10);
-        let volume = 0;
-        w.exercises.forEach(e => volume += e.sets * e.reps * e.weight);
-        daily[dateKey] = (daily[dateKey] || 0) + volume;
-      });
-      labels = Object.keys(daily).sort();
-      data = labels.map(k => daily[k]);
-    } else if (type === "week" || type === "month") {
-      const aggregate = {};
-      workouts.forEach(w => {
-        const date = new Date(w.date);
-        let key;
-        if (type === "week") {
-          date.setDate(date.getDate() - date.getDay());
-          key = date.toISOString().slice(0, 10);
-        } else {
-          key = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}`;
-        }
-        let volume = 0;
-        w.exercises.forEach(e => volume += e.sets * e.reps * e.weight);
-        aggregate[key] = (aggregate[key] || 0) + volume;
-      });
-      labels = Object.keys(aggregate).sort();
-      data = labels.map(k => aggregate[k]);
-    } else if (type === "muscle") {
-      const muscleMap = {
-        "Bench Press": "Chest",
-        "Squat": "Legs",
-        "Deadlift": "Back",
-        "Shoulder Press": "Shoulders",
-        "Bicep Curl": "Arms",
-        "Tricep Extension": "Arms",
-        "Plank": "Core",
-        "Crunch": "Core"
-      };
-      const counts = {};
-      workouts.forEach(w => {
-        w.exercises.forEach(e => {
-          const muscle = muscleMap[e.exercise] || "Other";
-          counts[muscle] = (counts[muscle] || 0) + e.sets * e.reps;
-        });
-      });
-      labels = Object.keys(counts);
-      data = labels.map(k => counts[k]);
-      bgColor = "rgba(254, 95, 85, 0.7)";
+  const ctx = document.getElementById("dynamicChart").getContext("2d");
+  dynamicChart = new Chart(ctx, {
+    type: type === "muscle" ? "pie" : "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: type === "muscle" ? "Total Reps per Muscle" : "Total Volume (kg)",
+        data,
+        backgroundColor: bgColor
+      }]
+    },
+    options: {
+      scales: type === "muscle" ? {} : { y: { beginAtZero: true } }
     }
+  });
+}
 
-    const ctx = document.getElementById("dynamicChart").getContext("2d");
-    dynamicChart = new Chart(ctx, {
-      type: type === "muscle" ? "pie" : "bar",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: type === "muscle" ? "Total Reps per Muscle Group" : "Total Volume (kg)",
-          data: data,
-          backgroundColor: bgColor,
-          borderColor: bgColor,
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: type === "muscle" ? {} : { y: { beginAtZero: true } }
+// ----------------------------
+// Max Weight by Rep Range (with exercise filter)
+// ----------------------------
+function renderMaxWeightChart(workouts, exercise) {
+  const repRanges = [1, 3, 5, 8];
+  const maxWeights = {1:0, 3:0, 5:0, 8:0};
+
+  workouts.forEach(w => {
+    w.exercises.forEach(e => {
+      if ((exercise === "all" || e.exercise === exercise) && repRanges.includes(e.reps)) {
+        maxWeights[e.reps] = Math.max(maxWeights[e.reps], e.weight);
       }
     });
-  }
+  });
 
-  // ----------------------------
-  // Max Weight by Rep Range Chart
-  // ----------------------------
-  function renderMaxWeightChart(workouts) {
-    const repRanges = [1, 3, 5, 8];
-    const maxWeights = {1:0,3:0,5:0,8:0};
+  const ctx = document.getElementById("maxWeightChart").getContext("2d");
 
-    workouts.forEach(w => {
-      w.exercises.forEach(e => {
-        if (repRanges.includes(e.reps)) maxWeights[e.reps] = Math.max(maxWeights[e.reps], e.weight);
-      });
-    });
+  if (maxWeightChartInstance) maxWeightChartInstance.destroy();
 
-    const ctx = document.getElementById("maxWeightChart").getContext("2d");
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: repRanges.map(r => `${r} Rep${r>1?'s':''}`),
-        datasets: [{
-          label: "Max Weight (kg)",
-          data: repRanges.map(r => maxWeights[r]),
-          backgroundColor: "rgba(254, 95, 85, 0.7)",
-          borderColor: "rgba(254, 95, 85, 1)",
-          borderWidth: 1
-        }]
-      },
-      options: { scales: { y: { beginAtZero: true } } }
-    });
-  }
+  maxWeightChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: repRanges.map(r => `${r} Rep${r>1?"s":""}`),
+      datasets: [{
+        label: exercise === "all" ? "Max Weight (kg)" : `Max Weight - ${exercise}`,
+        data: repRanges.map(r => maxWeights[r]),
+        backgroundColor: "rgba(254, 95, 85, 0.7)",
+        borderColor: "rgba(254, 95, 85, 1)",
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true } }
+    }
+  });
 }
 
 // ----------------------------

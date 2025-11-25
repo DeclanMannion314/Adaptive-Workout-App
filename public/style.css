@@ -374,10 +374,19 @@ input {
   font-size: 1rem;
   list-style: none;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.session-details {
+  background: #dfeee8;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
 }
 
 /* Chart Selector Dropdown */
-#chartTypeSelector {
+#chartTypeSelector,
+#exerciseSelector {
   padding: 10px 15px;
   border-radius: 6px;
   border: none;
@@ -389,7 +398,8 @@ input {
   transition: background-color 0.3s ease;
 }
 
-#chartTypeSelector:hover {
+#chartTypeSelector:hover,
+#exerciseSelector:hover {
   background-color: #6b8a8b;
 }
 
@@ -410,7 +420,6 @@ canvas {
 
   .dash-card {
     width: 90%;
-    min-width: auto;
   }
 
   canvas {
@@ -418,3 +427,20 @@ canvas {
   }
 }
 
+.chart-flex {
+  display: flex;
+  gap: 30px;
+  margin-top: 40px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.chart-box {
+  flex: 1;
+  min-width: 380px;
+}
+
+.chart-box canvas {
+  width: 100% !important;
+  height: 350px !important;
+}
