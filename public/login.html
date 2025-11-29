@@ -10,6 +10,7 @@
   <div class="auth-box">
     <h2>Login</h2>
 
+  <!-- Login Form -->  
     <form id="login-form">
       <input id="username" placeholder="Username" autocomplete="username" />
       <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
@@ -32,12 +33,14 @@
     </div>
 
   <script>
+    // Login Checks
   document.getElementById("login-form").addEventListener("submit", async (e) => {
-    e.preventDefault(); // prevent page reload
+    e.preventDefault();
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
 
+    // Ensures Both fields are full
     if (!username || !password) {
     showError("Please enter both username and password.");
     return;
@@ -54,11 +57,12 @@
     showError(data.message);
     return;
     }
-    window.location.href = "index.html"; // go to main app
+    window.location.href = "index.html";
   });
   </script>
 
     <script>
+      // Error handling using a modal instead of console prompts.
     function showError(msg) {
     document.getElementById("error-message").textContent = msg;
     document.getElementById("error-modal").style.display = "flex";

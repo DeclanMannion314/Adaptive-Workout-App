@@ -6,7 +6,6 @@ const PORT = process.env.PORT || 3000;
 // Database connection
 const db = new Database("./data/workouts.db");
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -23,9 +22,7 @@ app.use(
   })
 );
 
-// ----------------------
-// DATABASE SETUP
-// ----------------------
+// Database setup
 db.prepare(`
   CREATE TABLE IF NOT EXISTS current_workout (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,9 +63,7 @@ db.prepare(`
 `).run();
 
 
-// ----------------------
 // API ROUTES
-// ----------------------
 
 // Register User
 app.post("/api/register", async (req, res) => {
@@ -175,7 +170,7 @@ app.post("/api/workout", (req, res) => {
 // Edit a full session
 app.put("/api/session/:session_id", (req, res) => {
   const { session_id } = req.params;
-  const { exercises } = req.body; // array of {id, exercise, sets, reps, weight}
+  const { exercises } = req.body;
   if (!Array.isArray(exercises) || exercises.length === 0) return res.json({ success: false, message: "No exercises provided" });
 
   const updateStmt = db.prepare(`
@@ -220,7 +215,5 @@ app.get("/api/workouts/:user_id", (req, res) => {
   res.json(output);
 });
 
-// ----------------------
 // Start server
-// ----------------------
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

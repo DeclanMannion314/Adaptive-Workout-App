@@ -1,9 +1,7 @@
 let dynamicChart;
 let maxWeightChartInstance;
 
-// ----------------------------
-// Get Current Logged-in User
-// ----------------------------
+// Get the current user logged in.
 async function getLoggedInUser() {
   try {
     const res = await fetch("/api/profile");
@@ -20,9 +18,7 @@ async function getLoggedInUser() {
   }
 }
 
-// ----------------------------
-// Initialize Dashboard
-// ----------------------------
+// Dashboard functions
 async function initDashboard() {
   const userId = await getLoggedInUser();
   if (!userId) return;
@@ -34,7 +30,6 @@ async function initDashboard() {
   const chartSelector = document.getElementById("chartTypeSelector");
   const exerciseSelector = document.getElementById("exerciseSelector");
 
-  // Load workouts
   const workouts = await loadWorkouts(userId);
 
   updateDashboardStats(workouts);
@@ -62,9 +57,7 @@ async function initDashboard() {
   });
 }
 
-// ----------------------------
 // Load Workouts
-// ----------------------------
 async function loadWorkouts(userId) {
   try {
     const res = await fetch(`/api/workouts/${userId}`);
@@ -75,9 +68,7 @@ async function loadWorkouts(userId) {
   }
 }
 
-// ----------------------------
 // Dashboard Stats
-// ----------------------------
 function updateDashboardStats(workouts) {
   document.getElementById("total-workouts").textContent = workouts.length;
 
@@ -91,9 +82,8 @@ function updateDashboardStats(workouts) {
   document.getElementById("top-exercise").textContent = top;
 }
 
-// ----------------------------
-// Populate Sessions (click to expand)
-// ----------------------------
+// Populate Sessions for user to look back on
+// Click to expand feature
 function populateSessions(workouts) {
   const list = document.getElementById("session-list");
   list.innerHTML = "";
@@ -121,9 +111,7 @@ function populateSessions(workouts) {
   });
 }
 
-// ----------------------------
 // Dynamic Chart
-// ----------------------------
 function renderDynamicChart(workouts, type) {
   if (dynamicChart) dynamicChart.destroy();
 
@@ -203,9 +191,7 @@ function renderDynamicChart(workouts, type) {
   });
 }
 
-// ----------------------------
 // Max Weight by Rep Range (with exercise filter)
-// ----------------------------
 function renderMaxWeightChart(workouts, exercise) {
   const repRanges = [1, 3, 5, 8];
   const maxWeights = {1:0, 3:0, 5:0, 8:0};
@@ -240,7 +226,4 @@ function renderMaxWeightChart(workouts, exercise) {
   });
 }
 
-// ----------------------------
-// Start
-// ----------------------------
 initDashboard();

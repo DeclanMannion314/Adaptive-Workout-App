@@ -18,13 +18,27 @@ The **Adaptive Workout App** is a fitness tracking tool that allows users to log
 
 ```
 Adaptive-Workout-App/
- ┣ public/
- ┃ ┣ index.html       # Main page
- ┃ ┣ style.css        # Stylesheet
- ┃ ┗ script.js        # Front-end logic
- ┣ server.js           # Express server
- ┣ package.json        # Project configuration
- ┗ README.md           # This file
+data/
+    init.js
+    workouts.db
+node_modules/
+public/
+    Images/
+    login.html
+    register.html
+    index.html
+    profile.html
+    ai-coach.html
+    dashboard.html
+    ai-coach.html
+    style.css
+    ai-coach.js
+    dashboard.js
+    script.js
+package-lock.json
+package.json
+README.md
+server.js
 ```
 
 ---

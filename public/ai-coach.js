@@ -4,9 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resultsBox = document.getElementById("ai-results");
   const generateBtn = document.getElementById("generate-ai");
 
-  // -------------------------------
-  // Get logged-in user
-  // -------------------------------
+  // Get logged in user
   async function getLoggedInUser() {
     try {
       const res = await fetch("/api/profile");
@@ -23,9 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // -------------------------------
-  // Load user exercises dynamically
-  // -------------------------------
+  // Load user's exercises
   async function loadUserExercises(userId) {
     try {
       const res = await fetch(`/api/workouts/${userId}`);
@@ -42,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       // Populate dropdown
-      exerciseSelect.innerHTML = ""; // clear existing options
+      exerciseSelect.innerHTML = "";
       exerciseSet.forEach(ex => {
         const option = document.createElement("option");
         option.value = ex;
@@ -50,16 +46,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         exerciseSelect.appendChild(option);
       });
 
-      return workouts; // return full history for AI calculations
+      return workouts;
     } catch (err) {
       console.error("Failed to load exercises:", err);
       return [];
     }
   }
 
-  // -------------------------------
-  // Helper functions
-  // -------------------------------
+  // Calculation functions
+  // Uses the Epley formula to workout 1 rep maxes.
+  // Then uses the general rule that someone would be able to do 93% of their 1RM for 3 reps. Etc.
   function calculate1RM(weight, reps) {
     return Math.round(weight * (1 + reps / 30));
   }
@@ -90,6 +86,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const r = latest.reps;
     const s = latest.sets;
 
+    // In order to calculate the goal the algorithm uses progressive overload its base point.
+    // So in their next session the user should attempt to do an increase of 2.5% of the weight they did.
     switch (goal) {
       case "strength":
         return { weight: Math.round(w * 1.025), sets: s, reps: r };
@@ -102,9 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // -------------------------------
-  // Generate AI Recommendation
-  // -------------------------------
+  // Generates the recommendation using the calcuation functions
   async function generateAiRecommendation() {
     const exercise = exerciseSelect.value;
     const goal = goalSelect.value;
@@ -118,7 +114,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!userId) return;
 
     try {
-      const history = await loadUserExercises(userId); // dynamic history
+      const history = await loadUserExercises(userId);
 
       const latest = getLatestLift(history, exercise);
       if (!latest) {
@@ -130,6 +126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const repMaxes = calculateRepMaxes(oneRM);
       const nextLift = recommendNextLift(latest, goal);
 
+      // Using innerHTML on both the js and HTML page to show the recommendations.
       resultsBox.innerHTML = `
         <h3>AI Recommendation for ${exercise}</h3>
         <div class="ai-box">
@@ -158,14 +155,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // -------------------------------
   // Initialize page
-  // -------------------------------
   const userId = await getLoggedInUser();
   if (!userId) return;
 
   await loadUserExercises(userId);
 
-  // Event listener
+  // Gives the recommendations if the button is clicked.
   generateBtn.addEventListener("click", generateAiRecommendation);
 });

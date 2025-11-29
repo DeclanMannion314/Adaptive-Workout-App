@@ -52,7 +52,7 @@ body {
   border-radius: 8px;
   gap: 40px;
   box-sizing: border-box;
-  flex-wrap: wrap; /* allows wrapping on smaller screens */
+  flex-wrap: wrap;
 }
 
 /* Log Workout and Current Workout Boxes */
@@ -150,7 +150,6 @@ input {
   margin-bottom: 8px;
 }
 
-/* Responsive Design */
 @media (max-width: 1000px) {
   .main-container {
     flex-direction: column;
@@ -163,7 +162,7 @@ input {
     min-width: auto;
   }
 }
-/* Match new buttons with existing style */
+/* New buttons with existing style */
 .edit-btn {
   background-color: #FE5F55;
   color: white;
@@ -196,7 +195,7 @@ input {
   background-color: #ff4b40;
 }
 
-/* Clear Current Workout button (placed in form) */
+/* Clear Current Workout button */
 #clear-current {
   background-color: #FE5F55;
   color: white;
@@ -215,7 +214,7 @@ input {
 
 /* Modal Styles */
 .modal {
-  display: none; /* hidden by default */
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -257,13 +256,13 @@ input {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #7f7f7f; /* same as workout page */
+  background-color: #7f7f7f;
   font-family: "Poppins", sans-serif;
 }
 
 /* Auth box styling */
 .auth-box {
-  background-color: #7A9E9F; /* same as workout boxes */
+  background-color: #7A9E9F;
   padding: 40px;
   border-radius: 8px;
   width: 350px;
@@ -319,7 +318,7 @@ input {
   text-decoration: underline;
 }
 
-/* Responsive for small screens */
+/* For small screens */
 @media (max-width: 500px) {
   .auth-box {
     width: 90%;
@@ -327,7 +326,7 @@ input {
   }
 }
 
-/* Dashboard Container */
+/* Dashboard */
 .dashboard-container {
   background: #EEF5DB;
   padding: 40px;
@@ -384,7 +383,7 @@ input {
   margin-top: 10px;
 }
 
-/* Chart Selector Dropdown */
+/* Chart Dropdown */
 #chartTypeSelector,
 #exerciseSelector {
   padding: 10px 15px;
@@ -411,7 +410,6 @@ canvas {
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
-/* Responsive */
 @media (max-width: 1000px) {
   .dashboard-grid {
     flex-direction: column;
@@ -445,7 +443,7 @@ canvas {
   height: 350px !important;
 }
 
-/* AI COACH PAGE */
+/* AI coach page */
 .ai-container {
   display: flex;
   flex-direction: column;

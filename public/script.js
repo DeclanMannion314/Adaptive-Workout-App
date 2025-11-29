@@ -1,6 +1,6 @@
 let userId = null;
 
-// ---------- Check Login ----------
+// Get the current user logged in.
 async function checkLogin() {
   const res = await fetch("/api/profile");
   const data = await res.json();
@@ -10,7 +10,7 @@ async function checkLogin() {
     return;
   }
 
-  // Store logged-in user ID
+  // Stores logged in user ID
   userId = data.user.id;
 
   // Load data after userId is set
@@ -20,7 +20,7 @@ async function checkLogin() {
 
 checkLogin();
 
-// ---------- Add Exercise ----------
+// Add Exercise
 document.getElementById("add-workout").addEventListener("click", async () => {
   const exercise = document.getElementById("exercise-name").value.trim();
   const sets = parseInt(document.getElementById("sets").value);
@@ -42,7 +42,7 @@ document.getElementById("add-workout").addEventListener("click", async () => {
   loadCurrentWorkout();
 });
 
-// ---------- Clear Current Workout ----------
+// Clear Current Workout
 document.getElementById("clear-current").addEventListener("click", async () => {
   const exercises = await (await fetch(`/api/current/${userId}`)).json();
 
@@ -53,7 +53,7 @@ document.getElementById("clear-current").addEventListener("click", async () => {
   loadCurrentWorkout();
 });
 
-// ---------- Save Workout ----------
+// Save Workout
 document.getElementById("save-workout").addEventListener("click", async () => {
   const res = await fetch("/api/workout", {
     method: "POST",
@@ -68,7 +68,7 @@ document.getElementById("save-workout").addEventListener("click", async () => {
   loadHistory();
 });
 
-// ---------- Load Current Workout ----------
+// Load Current Workout
 async function loadCurrentWorkout() {
   const list = document.getElementById("workoutList");
   list.innerHTML = "";
@@ -98,7 +98,7 @@ async function loadCurrentWorkout() {
   });
 }
 
-// ---------- Load Workout History ----------
+// Load Workout History
 async function loadHistory() {
   const historyList = document.getElementById("history-list");
   historyList.innerHTML = "";
@@ -148,7 +148,7 @@ const editSets = document.getElementById("edit-sets");
 const editReps = document.getElementById("edit-reps");
 const editWeight = document.getElementById("edit-weight");
 
-// ---------- Modal Handlers ----------
+// Modal Handlers
 function openEditModal(ex, type, sessionId = null) {
   currentEdit = { ...ex, type, sessionId };
   editExerciseName.value = ex.exercise;
@@ -165,7 +165,7 @@ function closeEditModal() {
 
 cancelEditBtn.addEventListener("click", closeEditModal);
 
-// ---------- Save Edits ----------
+// Save Edits
 editForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
